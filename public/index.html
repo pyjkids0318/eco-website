@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>에코 라이프 - 메인</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/login.html">로그인</a> | <a href="/signup.html">회원가입</a> | <a href="/record.html">행동 기록</a>
+        </nav>
+        <h1>🌱 에코 라이프</h1>
+        
+        <section class="box">
+            <h2>오늘의 친환경 행동 추천</h2>
+            <div id="recommendations">로딩 중...</div>
+        </section>
+
+        <section class="box">
+            <h2>누적 탄소 절감량</h2>
+            <p><span id="total-carbon" class="highlight">0</span> kg</p>
+        </section>
+    </div>
+
+    <script>
+        // 추천 행동 가져오기
+        fetch('/api/recommendations')
+            .then(res => res.json())
+            .then(data => {
+                const div = document.getElementById('recommendations');
+                div.innerHTML = '';
+                data.forEach(item => {
+                    div.innerHTML += `<div class="item">✅ ${item.action_name} <br> <small>(절감량: ${item.carbon_saved}kg)</small></div>`;
+                });
+            });
+
+        // 누적 탄소량 가져오기
+        fetch('/api/total-carbon')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('total-carbon').innerText = data.total;
+            });
+    </script>
+</body>
+</html>

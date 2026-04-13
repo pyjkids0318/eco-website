@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>행동 기록 - 에코 라이프</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav><a href="/">홈으로</a></nav>
+        <h1>✍️ 오늘 한 일 기록하기</h1>
+        <div class="box">
+            <p>오늘 실천한 친환경 행동을 선택하세요:</p>
+            <div id="action-list">로딩 중...</div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/actions')
+            .then(res => res.json())
+            .then(data => {
+                const div = document.getElementById('action-list');
+                div.innerHTML = '';
+                data.forEach(item => {
+                    div.innerHTML += `
+                        <button class="action-btn" onclick="saveRecord(${item.id}, '${item.action_name}', ${item.carbon_saved})">
+                            ${item.action_name} (${item.carbon_saved}kg)
+                        </button>
+                    `;
+                });
+            });
+
+        function saveRecord(id, name, saved) {
+            fetch('/api/record', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ actionId: id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert(`${name} 기록 완료! ${saved}kg의 탄소를 아꼈습니다.`);
+                    location.href = '/';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
