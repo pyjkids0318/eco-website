@@ -5,77 +5,126 @@
     <title>에코 라이프 - 메인</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container">
 
-        <nav id="menu"></nav>
+<div class="container">
 
-        <h1>🌱 에코 라이프</h1>
-        
-        <section class="box">
-            <h2>오늘의 친환경 행동 추천</h2>
-            <div id="recommendations">로딩 중...</div>
-        </section>
+    <nav id="menu"></nav>
 
-        <section class="box">
-            <h2>누적 탄소 절감량</h2>
-            <p><span id="total-carbon" class="highlight">0</span> kg</p>
-        </section>
-    </div>
+    <h1>🌱 에코 라이프</h1>
 
-    <script>
+    <section class="box">
 
-        // 로그인 상태 확인
-        const loggedIn = localStorage.getItem("loggedIn");
+        <h2>오늘의 친환경 행동 추천</h2>
 
-        const menu = document.getElementById("menu");
+        <div id="recommendations">
+            로딩 중...
+        </div>
 
-        if (loggedIn === "true") {
-            menu.innerHTML = `
-                <a href="/record.html">행동 기록</a> |
-                <a href="#" id="logoutBtn">로그아웃</a>
-            `;
+    </section>
 
-            document.addEventListener("click", function(e) {
-                if (e.target.id === "logoutBtn") {
-                    localStorage.removeItem("loggedIn");
-                    location.reload();
-                }
-            });
+    <section class="box">
 
-        } else {
-            menu.innerHTML = `
-                <a href="/login.html">로그인</a> |
-                <a href="/signup.html">회원가입</a> |
-                <a href="/record.html">행동 기록</a>
-            `;
+        <h2>누적 탄소 절감량</h2>
+
+        <p>
+            <span id="total-carbon" class="highlight">0</span> kg
+        </p>
+
+    </section>
+
+</div>
+
+<script>
+
+    // =========================
+    // 로그인 메뉴 처리
+    // =========================
+
+    const loggedIn = localStorage.getItem("loggedIn");
+
+    const menu = document.getElementById("menu");
+
+    if (loggedIn === "true") {
+
+        menu.innerHTML = `
+            <a href="/record.html">행동 기록</a> |
+            <a href="#" id="logoutBtn">로그아웃</a>
+        `;
+
+    } else {
+
+        menu.innerHTML = `
+            <a href="/login.html">로그인</a> |
+            <a href="/signup.html">회원가입</a> |
+            <a href="/record.html">행동 기록</a>
+        `;
+
+    }
+
+
+    // =========================
+    // 로그아웃
+    // =========================
+
+    document.addEventListener("click", function(e) {
+
+        if (e.target.id === "logoutBtn") {
+
+            localStorage.removeItem("loggedIn");
+
+            window.location.href = "/index.html";
+
         }
 
-        // 추천 행동 가져오기
-        fetch('/api/recommendations')
-            .then(res => res.json())
-            .then(data => {
-                const div = document.getElementById('recommendations');
-                div.innerHTML = '';
+    });
 
-                data.forEach(item => {
-                    div.innerHTML += `
-                        <div class="item">
-                            ✅ ${item.action_name}
-                            <br>
-                            <small>(절감량: ${item.carbon_saved}kg)</small>
-                        </div>
-                    `;
-                });
+
+    // =========================
+    // 추천 행동 가져오기
+    // =========================
+
+    fetch('/api/recommendations')
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            const div = document.getElementById('recommendations');
+
+            div.innerHTML = '';
+
+            data.forEach(item => {
+
+                div.innerHTML += `
+                    <div class="item">
+                        ✅ ${item.action_name}
+                        <br>
+                        <small>(절감량: ${item.carbon_saved}kg)</small>
+                    </div>
+                `;
+
             });
 
-        // 누적 탄소량 가져오기
-        fetch('/api/total-carbon')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('total-carbon').innerText = data.total;
-            });
+        });
 
-    </script>
+
+    // =========================
+    // 누적 탄소량
+    // =========================
+
+    fetch('/api/total-carbon')
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            document.getElementById('total-carbon').innerText = data.total;
+
+        });
+
+</script>
+
 </body>
 </html>
