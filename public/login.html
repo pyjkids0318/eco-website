@@ -5,87 +5,88 @@
     <title>로그인 - 에코 라이프</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <nav>
-            <a href="/">홈으로</a>
-        </nav>
+    <nav>
+        <a href="/">홈으로</a>
+    </nav>
 
-        <h1>🔐 로그인</h1>
+    <h1>🔐 로그인</h1>
 
-        <form id="loginForm" class="box">
+    <form id="loginForm" class="box">
 
-            <input type="text" name="username" placeholder="아이디" required>
-            <br>
+        <input type="text" name="username" placeholder="아이디" required>
+        <br>
 
-            <input type="password" name="password" placeholder="비밀번호" required>
-            <br>
+        <input type="password" name="password" placeholder="비밀번호" required>
+        <br>
 
-            <button type="submit">로그인</button>
+        <button type="submit">로그인</button>
 
-        </form>
+    </form>
 
-        <p>
-            계정이 없으신가요?
-            <a href="/signup.html">회원가입</a>
-        </p>
+    <p>
+        계정이 없으신가요?
+        <a href="/signup.html">회원가입</a>
+    </p>
 
-    </div>
+</div>
 
-    <script>
+<script>
 
-        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
 
-            e.preventDefault();
+    e.preventDefault();
 
-            const username = document.querySelector('input[name="username"]').value;
-            const password = document.querySelector('input[name="password"]').value;
+    const username = document.querySelector('input[name="username"]').value;
 
-            try {
+    const password = document.querySelector('input[name="password"]').value;
 
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username,
-                        password
-                    })
-                });
+    try {
 
-                const data = await res.json();
+        const res = await fetch('/api/login', {
 
-                console.log(data);
+            method: 'POST',
 
-                // 로그인 성공 처리
-                if (data.success || res.ok) {
+            headers: {
+                'Content-Type': 'application/json'
+            },
 
-                    localStorage.setItem("loggedIn", "true");
-
-                    alert("로그인 성공!");
-
-                    window.location.href = "/";
-
-                } else {
-
-                    alert("로그인 실패");
-
-                }
-
-            } catch(err) {
-
-                console.error(err);
-
-                alert("오류 발생");
-
-            }
+            body: JSON.stringify({
+                username,
+                password
+            })
 
         });
 
-    </script>
+        const data = await res.json();
+
+        if (data.success) {
+
+            localStorage.setItem("loggedIn", "true");
+
+            window.location.href = "/index.html";
+
+        } else {
+
+            alert("로그인 실패");
+
+        }
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert("오류 발생");
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>
