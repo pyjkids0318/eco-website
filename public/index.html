@@ -33,25 +33,43 @@ const username = localStorage.getItem("username");
 const menu = document.getElementById("menu");
 
 if (username) {
+
   menu.innerHTML = `
     <span>${username}</span> |
     <a href="/record.html">기록</a> |
     <a href="#" id="logout">로그아웃</a>
   `;
+
 } else {
+
   menu.innerHTML = `
     <a href="/login.html">로그인</a> |
     <a href="/signup.html">회원가입</a>
   `;
+
 }
 
+// =====================
+// 로그아웃
+// =====================
 document.addEventListener("click", (e) => {
+
   if (e.target.id === "logout") {
+
     localStorage.removeItem("username");
+
+    document.getElementById("total-carbon").innerText = "0";
+
     location.reload();
+
   }
+
 });
 
+
+// =====================
+// 추천 행동
+// =====================
 fetch("/api/recommendations")
 .then(r => r.json())
 .then(data => {
@@ -61,11 +79,23 @@ fetch("/api/recommendations")
     `).join("");
 });
 
-fetch(`/api/total-carbon?username=${username}`)
-.then(r => r.json())
-.then(data => {
-  document.getElementById("total-carbon").innerText = data.total;
-});
+
+// =====================
+// 탄소량 (핵심 수정)
+// =====================
+if (username && username !== "null") {
+
+  fetch(`/api/total-carbon?username=${username}`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("total-carbon").innerText = data.total;
+    });
+
+} else {
+
+  document.getElementById("total-carbon").innerText = "0";
+
+}
 
 </script>
 
