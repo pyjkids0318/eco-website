@@ -1,91 +1,50 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>로그인 - 에코 라이프</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>로그인</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
 <div class="container">
 
-    <nav>
-        <a href="/">홈으로</a>
-    </nav>
+<nav><a href="/">홈</a></nav>
 
-    <h1>🔐 로그인</h1>
+<h1>로그인</h1>
 
-    <form id="loginForm" class="box">
-
-        <input type="text" name="username" placeholder="아이디" required>
-        <br>
-
-        <input type="password" name="password" placeholder="비밀번호" required>
-        <br>
-
-        <button type="submit">로그인</button>
-
-    </form>
-
-    <p>
-        계정이 없으신가요?
-        <a href="/signup.html">회원가입</a>
-    </p>
+<form id="loginForm" class="box">
+<input name="username" placeholder="아이디" required>
+<br>
+<input type="password" name="password" placeholder="비밀번호" required>
+<br>
+<button>로그인</button>
+</form>
 
 </div>
 
 <script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-document.getElementById("loginForm").addEventListener("submit", async function(e) {
+  const username = e.target.username.value;
+  const password = e.target.password.value;
 
-    e.preventDefault();
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ username, password })
+  });
 
-    const username = document.querySelector('input[name="username"]').value;
+  const data = await res.json();
 
-    const password = document.querySelector('input[name="password"]').value;
-
-    try {
-
-        const res = await fetch('/api/login', {
-
-            method: 'POST',
-
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-                username,
-                password
-            })
-
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-
-            localStorage.setItem("loggedIn", "true");
-
-            window.location.href = "/index.html";
-
-        } else {
-
-            alert("로그인 실패");
-
-        }
-
-    } catch(err) {
-
-        console.error(err);
-
-        alert("오류 발생");
-
-    }
-
+  if (data.success) {
+    localStorage.setItem("username", data.username);
+    location.href = "/";
+  } else {
+    alert("로그인 실패");
+  }
 });
-
 </script>
 
 </body>
