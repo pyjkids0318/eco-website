@@ -1,128 +1,70 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>에코 라이프 - 메인</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>에코 라이프</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
 <div class="container">
 
-    <nav id="menu"></nav>
+<nav id="menu"></nav>
 
-    <h1>🌱 에코 라이프</h1>
+<h1>🌱 에코 라이프</h1>
 
-    <section class="box">
+<section class="box">
+<h2>추천</h2>
+<div id="recommendations"></div>
+</section>
 
-        <h2>오늘의 친환경 행동 추천</h2>
-
-        <div id="recommendations">
-            로딩 중...
-        </div>
-
-    </section>
-
-    <section class="box">
-
-        <h2>누적 탄소 절감량</h2>
-
-        <p>
-            <span id="total-carbon" class="highlight">0</span> kg
-        </p>
-
-    </section>
+<section class="box">
+<h2>탄소 절감량</h2>
+<span id="total-carbon">0</span> kg
+</section>
 
 </div>
 
 <script>
 
-    // =========================
-    // 로그인 메뉴 처리
-    // =========================
+const username = localStorage.getItem("username");
 
-    const loggedIn = localStorage.getItem("loggedIn");
+const menu = document.getElementById("menu");
 
-    const menu = document.getElementById("menu");
+if (username) {
+  menu.innerHTML = `
+    <span>${username}</span> |
+    <a href="/record.html">기록</a> |
+    <a href="#" id="logout">로그아웃</a>
+  `;
+} else {
+  menu.innerHTML = `
+    <a href="/login.html">로그인</a> |
+    <a href="/signup.html">회원가입</a>
+  `;
+}
 
-    if (loggedIn === "true") {
+document.addEventListener("click", (e) => {
+  if (e.target.id === "logout") {
+    localStorage.removeItem("username");
+    location.reload();
+  }
+});
 
-        menu.innerHTML = `
-            <a href="/record.html">행동 기록</a> |
-            <a href="#" id="logoutBtn">로그아웃</a>
-        `;
+fetch("/api/recommendations")
+.then(r => r.json())
+.then(data => {
+  document.getElementById("recommendations").innerHTML =
+    data.map(i => `
+      <div>✅ ${i.action_name} (${i.carbon_saved}kg)</div>
+    `).join("");
+});
 
-    } else {
-
-        menu.innerHTML = `
-            <a href="/login.html">로그인</a> |
-            <a href="/signup.html">회원가입</a> |
-            <a href="/record.html">행동 기록</a>
-        `;
-
-    }
-
-
-    // =========================
-    // 로그아웃
-    // =========================
-
-    document.addEventListener("click", function(e) {
-
-        if (e.target.id === "logoutBtn") {
-
-            localStorage.removeItem("loggedIn");
-
-            window.location.href = "/index.html";
-
-        }
-
-    });
-
-
-    // =========================
-    // 추천 행동 가져오기
-    // =========================
-
-    fetch('/api/recommendations')
-
-        .then(res => res.json())
-
-        .then(data => {
-
-            const div = document.getElementById('recommendations');
-
-            div.innerHTML = '';
-
-            data.forEach(item => {
-
-                div.innerHTML += `
-                    <div class="item">
-                        ✅ ${item.action_name}
-                        <br>
-                        <small>(절감량: ${item.carbon_saved}kg)</small>
-                    </div>
-                `;
-
-            });
-
-        });
-
-
-    // =========================
-    // 누적 탄소량
-    // =========================
-
-    fetch('/api/total-carbon')
-
-        .then(res => res.json())
-
-        .then(data => {
-
-            document.getElementById('total-carbon').innerText = data.total;
-
-        });
+fetch("/api/total-carbon")
+.then(r => r.json())
+.then(data => {
+  document.getElementById("total-carbon").innerText = data.total;
+});
 
 </script>
 
