@@ -2,16 +2,17 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>기록</title>
+<title>행동 기록</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>행동 기록</h1>
+<h1>🌱 행동 기록</h1>
 
-<div id="list"></div>
+<div id="actions">로딩중...</div>
 
 </div>
 
@@ -20,25 +21,46 @@
 const username = localStorage.getItem("username");
 
 fetch("/api/actions")
-.then(r => r.json())
+.then(res => res.json())
 .then(data => {
-  document.getElementById("list").innerHTML =
-    data.map(a => `
-      <div>
-        ${a.action_name}
-        <button onclick="save(${a.id})">기록</button>
-      </div>
-    `).join("");
+
+  const container = document.getElementById("actions");
+
+  container.innerHTML = data.map(item => `
+    <div class="box">
+      <strong>${item.action_name}</strong>
+      <div>🌿 ${item.carbon_saved} kg 절감</div>
+
+      <button onclick="record(${item.id})">
+        기록하기
+      </button>
+    </div>
+  `).join("");
+
 });
 
-async function save(actionId) {
+async function record(actionId) {
+
+  const username = localStorage.getItem("username");
+
+  if (!username) {
+    alert("로그인 필요");
+    return;
+  }
+
   await fetch("/api/record", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ actionId, username })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      actionId,
+      username
+    })
   });
 
-  alert("저장 완료");
+  alert("기록 완료!");
+
 }
 
 </script>
