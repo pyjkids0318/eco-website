@@ -30,16 +30,21 @@ app.get('/api/recommendations', async (req, res) => {
 
 
 // =====================
-// 전체 탄소량
-// (전체 사용자 기준)
+// 유저별 탄소량
 // =====================
 app.get('/api/total-carbon', async (req, res) => {
+
+  const { username } = req.query;
+
   try {
+
     const result = await pool.query(`
       SELECT SUM(e.carbon_saved) as total
       FROM user_logs u
       JOIN eco_actions e ON u.action_id = e.id
-    `);
+      JOIN users us ON u.user_id = us.id
+      WHERE us.username = $1
+    `, [username]);
 
     res.json({
       total: Number(result.rows[0].total || 0).toFixed(2)
@@ -48,52 +53,19 @@ app.get('/api/total-carbon', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+
 });
 
 
 // =====================
-// 회원가입
+// 행동 목록
 // =====================
-app.post('/api/signup', async (req, res) => {
-  const { username, password, email } = req.body;
-
-  try {
-    await pool.query(
-      'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
-      [username, password, email]
-    );
-
-    res.redirect('/login.html');
-
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-
-// =====================
-// 로그인 (DB 검증만)
-// =====================
-app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-
+app.get('/api/actions', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM users WHERE username = $1 AND password = $2',
-      [username, password]
+      'SELECT * FROM eco_actions ORDER BY action_name ASC'
     );
-
-    if (result.rows.length > 0) {
-      res.json({
-        success: true,
-        username
-      });
-    } else {
-      res.status(401).json({
-        success: false
-      });
-    }
-
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -101,12 +73,14 @@ app.post('/api/login', async (req, res) => {
 
 
 // =====================
-// 행동 기록 (유저별)
+// 기록 저장 (유저별)
 // =====================
 app.post('/api/record', async (req, res) => {
+
   const { actionId, username } = req.body;
 
   try {
+
     const userResult = await pool.query(
       'SELECT id FROM users WHERE username = $1',
       [username]
@@ -132,7 +106,59 @@ app.post('/api/record', async (req, res) => {
 
 
 // =====================
+// 회원가입
+// =====================
+app.post('/api/signup', async (req, res) => {
+
+  const { username, password, email } = req.body;
+
+  try {
+
+    await pool.query(
+      'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
+      [username, password, email]
+    );
+
+    res.redirect('/login.html');
+
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
+// =====================
+// 로그인
+// =====================
+app.post('/api/login', async (req, res) => {
+
+  const { username, password } = req.body;
+
+  try {
+
+    const result = await pool.query(
+      'SELECT * FROM users WHERE username = $1 AND password = $2',
+      [username, password]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({
+        success: true,
+        username
+      });
+    } else {
+      res.status(401).json({ success: false });
+    }
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// =====================
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
