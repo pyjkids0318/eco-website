@@ -7,14 +7,59 @@
 </head>
 <body>
     <div class="container">
-        <nav><a href="/">홈으로</a></nav>
+
+        <nav>
+            <a href="/">홈으로</a>
+        </nav>
+
         <h1>🔐 로그인</h1>
-        <form action="/api/login" method="POST" class="box">
-            <input type="text" name="username" placeholder="아이디" required><br>
-            <input type="password" name="password" placeholder="비밀번호" required><br>
+
+        <form class="box">
+            <input type="text" name="username" placeholder="아이디" required>
+            <br>
+
+            <input type="password" name="password" placeholder="비밀번호" required>
+            <br>
+
             <button type="submit">로그인</button>
         </form>
-        <p>계정이 없으신가요? <a href="/signup.html">회원가입</a></p>
+
+        <p>
+            계정이 없으신가요?
+            <a href="/signup.html">회원가입</a>
+        </p>
+
     </div>
+
+    <script>
+
+        const form = document.querySelector("form");
+
+        form.addEventListener("submit", async (e) => {
+
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res.ok) {
+
+                localStorage.setItem("loggedIn", "true");
+
+                location.href = "/";
+
+            } else {
+
+                alert("로그인 실패");
+
+            }
+
+        });
+
+    </script>
 </body>
 </html>
