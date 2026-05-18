@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
 
         <nav>
@@ -14,7 +15,8 @@
 
         <h1>🔐 로그인</h1>
 
-        <form class="box">
+        <form id="loginForm" class="box">
+
             <input type="text" name="username" placeholder="아이디" required>
             <br>
 
@@ -22,6 +24,7 @@
             <br>
 
             <button type="submit">로그인</button>
+
         </form>
 
         <p>
@@ -33,33 +36,56 @@
 
     <script>
 
-        const form = document.querySelector("form");
-
-        form.addEventListener("submit", async (e) => {
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
 
             e.preventDefault();
 
-            const formData = new FormData(form);
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
 
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                body: formData
-            });
+            try {
 
-            if (res.ok) {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+                });
 
-                localStorage.setItem("loggedIn", "true");
+                const data = await res.json();
 
-                location.href = "/";
+                console.log(data);
 
-            } else {
+                // 로그인 성공 처리
+                if (data.success || res.ok) {
 
-                alert("로그인 실패");
+                    localStorage.setItem("loggedIn", "true");
+
+                    alert("로그인 성공!");
+
+                    window.location.href = "/";
+
+                } else {
+
+                    alert("로그인 실패");
+
+                }
+
+            } catch(err) {
+
+                console.error(err);
+
+                alert("오류 발생");
 
             }
 
         });
 
     </script>
+
 </body>
 </html>
