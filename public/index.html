@@ -7,6 +7,7 @@
 </head>
 
 <body>
+
 <div class="container">
 
 <nav id="menu"></nav>
@@ -14,12 +15,12 @@
 <h1>🌱 에코 라이프</h1>
 
 <section class="box">
-<h2>추천</h2>
+<h2>추천 행동</h2>
 <div id="recommendations"></div>
 </section>
 
 <section class="box">
-<h2>탄소 절감량</h2>
+<h2>누적 탄소 절감량</h2>
 <span id="total-carbon">0</span> kg
 </section>
 
@@ -60,7 +61,7 @@ fetch("/api/recommendations")
     `).join("");
 });
 
-fetch("/api/total-carbon")
+fetch(`/api/total-carbon?username=${username}`)
 .then(r => r.json())
 .then(data => {
   document.getElementById("total-carbon").innerText = data.total;
