@@ -7,9 +7,9 @@
 </head>
 <body>
     <div class="container">
-        <nav>
-            <a href="/login.html">로그인</a> | <a href="/signup.html">회원가입</a> | <a href="/record.html">행동 기록</a>
-        </nav>
+
+        <nav id="menu"></nav>
+
         <h1>🌱 에코 라이프</h1>
         
         <section class="box">
@@ -24,14 +24,48 @@
     </div>
 
     <script>
+
+        // 로그인 상태 확인
+        const loggedIn = localStorage.getItem("loggedIn");
+
+        const menu = document.getElementById("menu");
+
+        if (loggedIn === "true") {
+            menu.innerHTML = `
+                <a href="/record.html">행동 기록</a> |
+                <a href="#" id="logoutBtn">로그아웃</a>
+            `;
+
+            document.addEventListener("click", function(e) {
+                if (e.target.id === "logoutBtn") {
+                    localStorage.removeItem("loggedIn");
+                    location.reload();
+                }
+            });
+
+        } else {
+            menu.innerHTML = `
+                <a href="/login.html">로그인</a> |
+                <a href="/signup.html">회원가입</a> |
+                <a href="/record.html">행동 기록</a>
+            `;
+        }
+
         // 추천 행동 가져오기
         fetch('/api/recommendations')
             .then(res => res.json())
             .then(data => {
                 const div = document.getElementById('recommendations');
                 div.innerHTML = '';
+
                 data.forEach(item => {
-                    div.innerHTML += `<div class="item">✅ ${item.action_name} <br> <small>(절감량: ${item.carbon_saved}kg)</small></div>`;
+                    div.innerHTML += `
+                        <div class="item">
+                            ✅ ${item.action_name}
+                            <br>
+                            <small>(절감량: ${item.carbon_saved}kg)</small>
+                        </div>
+                    `;
                 });
             });
 
@@ -41,6 +75,7 @@
             .then(data => {
                 document.getElementById('total-carbon').innerText = data.total;
             });
+
     </script>
 </body>
 </html>
