@@ -30,8 +30,26 @@ app.get('/api/recommendations', async (req, res) => {
 
 
 // =====================
+// 🔥 추가된 부분: 행동 목록
+// =====================
+app.get('/api/actions', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, action_name, carbon_saved
+      FROM eco_actions
+      ORDER BY id
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// =====================
 // 유저별 탄소량
-// (로그인 시만 값 반환)
 // =====================
 app.get('/api/total-carbon', async (req, res) => {
 
@@ -39,7 +57,6 @@ app.get('/api/total-carbon', async (req, res) => {
 
   try {
 
-    // username 없으면 0 반환 (중요)
     if (!username || username === "null") {
       return res.json({ total: "0.00" });
     }
